@@ -24,16 +24,16 @@ public class BinaryNode implements ExprNode {
 		double evalLeft = left.evaluation();
 		double evalRight = right.evaluation();
 		
-		if (operator == "+") {
+		if (operator.equals("+")) {
 			return evalLeft + evalRight;
 		}
-		else if (operator == "-") {
+		else if (operator.equals("-")) {
 			return evalLeft - evalRight;
 		}
-		else if (operator == "*") {
+		else if (operator.equals("*")) {
 			return evalLeft * evalRight;
 		}
-		else if (operator == "/") {
+		else if (operator.equals("/")) {
 			return evalLeft / evalRight;
 		}
 		

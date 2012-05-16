@@ -20,7 +20,7 @@ public class UnaryNode implements ExprNode {
 	}
 
 	public double evaluation() throws ExprError {
-		if (operator == "-") {
+		if (operator.equals("-")) {
 			return -opNode.evaluation();
 		}
 		

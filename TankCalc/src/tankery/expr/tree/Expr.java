@@ -3,6 +3,7 @@
  */
 package tankery.expr.tree;
 
+import tankery.expr.exception.ExprCreateException;
 import tankery.expr.exception.ExprError;
 
 /**
@@ -16,17 +17,25 @@ public class Expr implements ExprNode {
 	 */
 	private ExprNode exprNode;
 	
-	public Expr(int n) {
+	public Expr(double n) {
 		exprNode = new NumberNode(n);
 	}
-	public Expr(double n) {
+	public Expr(String numStr) throws ExprError {
+		double n = 0;
+		try {
+			n = Double.parseDouble(numStr);
+		}
+		catch (NumberFormatException e) {
+			throw new ExprCreateException();
+		}
 		exprNode = new NumberNode(n);
 	}
 	public Expr(String op, Expr nd) {
 		exprNode = new UnaryNode(op, nd);
 	}
 	public Expr(String op, Expr ln, Expr rn) {
-		exprNode = new BinaryNode(op, ln, rn);
+		exprNode = (ln == null) ?
+				new UnaryNode(op, rn) : new BinaryNode(op, ln, rn);
 	}
 	public Expr(ExprNode nd) {
 		exprNode = nd;
