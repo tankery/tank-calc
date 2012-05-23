@@ -6,13 +6,11 @@ import tankery.expr.tree.Expr;
 public class ExprInterpreter {
 	
 	private String expression = "";
-	private final String validOperatorPattern = "[\\+\\-\\*/]";
 	
 	public ExprInterpreter(String expr) {
-		expression = expr;
-		
-		checkError();
-		normalize();
+		ExprCleaner cleaner = new ExprCleaner(expr);
+		ExprNomalizer nomalizer = new ExprNomalizer(cleaner);
+		expression = nomalizer.getResult();
 	}
 	
 	public Expr generateExprTree() {
@@ -24,6 +22,10 @@ public class ExprInterpreter {
 		return null;
 	}
 	
+	public String getExpression() {
+		return expression;
+	}
+
 	private Expr exprStr2Tree(String exprStr) throws ExprError {
 		// remove the spaces.
 		exprStr = exprStr.trim();
@@ -32,7 +34,7 @@ public class ExprInterpreter {
 			return null;
 		
 		// pure number
-		if (exprStr.matches("[\\d\\.]+")) {
+		if (exprStr.matches(ExprValidation.validNumber() + "+")) {
 			return new Expr(exprStr);
 		}
 		
@@ -106,15 +108,11 @@ public class ExprInterpreter {
 		String s = "";
 		s += c;
 		
-		return s.matches(validOperatorPattern);
-	}
-
-	private void checkError() {
-		
+		return isOperator(s);
 	}
 	
-	private void normalize() {
-		//
+	private boolean isOperator(String s) {
+		return s.matches(ExprValidation.validOperator());
 	}
 
 }

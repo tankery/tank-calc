@@ -17,7 +17,7 @@ public final class ExprTester {
 
 	private static void testExprInterpreter() {
 		System.out.println("------------------ Test ExprInterpreter ----------------");
-		ExprInterpreter interpreter = new ExprInterpreter("((-5) / (5.0 - 4.0))");
+		ExprInterpreter interpreter = new ExprInterpreter("((-5)% / (5.0 - 4.0))");
 		Expr t = interpreter.generateExprTree();
 		System.out.println(t.exprString() + " = " + t.evaluation());
 		System.out.println();
