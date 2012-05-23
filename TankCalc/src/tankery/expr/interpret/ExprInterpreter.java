@@ -1,5 +1,7 @@
 package tankery.expr.interpret;
 
+import java.util.Vector;
+
 import tankery.expr.exception.ExprError;
 import tankery.expr.tree.Expr;
 
@@ -29,7 +31,10 @@ public class ExprInterpreter {
 	private Expr exprStr2Tree(String exprStr) throws ExprError {
 		// remove the spaces.
 		exprStr = exprStr.trim();
+		// remove the redundant brace.
+		exprStr = removeRedundantBrace(exprStr);
 		
+		// empty node.
 		if (exprStr.isEmpty())
 			return null;
 		
@@ -38,34 +43,11 @@ public class ExprInterpreter {
 			return new Expr(exprStr);
 		}
 		
-		// remove the redundant brace.
-		for (int i = 0, level = 0; i < exprStr.length(); i++) {
-			char c = exprStr.charAt(i);
-			
-			if (c == '(') {
-				level++;
-			}
-			else if (c == ')') {
-				level--;
-				if (level == 0) {
-					if (i == exprStr.length() - 1) {
-						// using recursion to avoid nested brace.
-						return exprStr2Tree(exprStr.substring(1, i));
-					}
-					else {
-						// redundant brace already removed.
-						break;
-					}
-				}
-			}
-		}
-		
-		// generate the expression tree.
-		String leftExpr = "";
-		String rightExpr = "";
-		String operator = "";
+		// generate the expression vector.
+		Vector<String> exprs = new Vector<String>(0);
+		Vector<String> operators = new Vector<String>(0);
 		int level = 0;
-		boolean atLeft = true;
+		int exprIndex = 0;
 		for (int i = 0; i < exprStr.length(); i++) {
 			char c = exprStr.charAt(i);
 			
@@ -84,26 +66,36 @@ public class ExprInterpreter {
 			
 			
 			if (level == 0 && isOperator(c)) {
-				atLeft = false;
-				operator += c;
-			}
-			else if (atLeft) {
-				leftExpr += c;
+				operators.add("" + c);
+				exprIndex++;
 			}
 			else {
-				rightExpr += c;
+				while (exprIndex > exprs.size()) {
+					exprs.add("");
+				}
+				
+				if (exprIndex == exprs.size()) {
+					exprs.add("" + c);
+				}
+				else {
+					exprs.set(exprIndex, exprs.elementAt(exprIndex) + c);
+				}
 			}
 		}
 		
-		if (operator.trim().isEmpty() ||
-				rightExpr.trim().isEmpty()) {
+		for (int i = 0; i < operators.size(); i++) {
+			if (operators.elementAt(i).trim().isEmpty()) {
 				throw new ExprError("\'" + exprStr + "\' is not valid by unknow reason.");
+			}
+		}
+		if (exprs.size() - operators.size() != 1) {
+			throw new ExprError("\'" + exprStr + "\' is not valid by unknow reason.");
 		}
 		
-		// recursion calling this function to create an expression tree.
-		return new Expr(operator, exprStr2Tree(leftExpr), exprStr2Tree(rightExpr));
+		
+		return exprVecotr2Tree(exprs, operators);
 	}
-	
+
 	private boolean isOperator(char c) {
 		String s = "";
 		s += c;
@@ -113,6 +105,81 @@ public class ExprInterpreter {
 	
 	private boolean isOperator(String s) {
 		return s.matches(ExprValidation.validOperator());
+	}
+	
+	private int findHighestOperator(Vector<String> ops) {
+		if (ops == null) {
+			return -1;
+		}
+		
+		// if contains "*" or "/", return it.
+		for (int i = 0; i < ops.size(); i++) {
+			if (ops.elementAt(i).equals("*") || ops.elementAt(i).equals("/")) {
+				return i;
+			}
+		}
+
+		return 0;
+	}
+
+	private String removeRedundantBrace(String exprStr) {
+		for (int i = 0, level = 0; i < exprStr.length(); i++) {
+			char c = exprStr.charAt(i);
+			
+			// the first character is not '(' means no '()' surrounding expression.
+			if (i == 0 && c != '(') {
+				break;
+			}
+			
+			if (c == '(') {
+				level++;
+			}
+			else if (c == ')') {
+				level--;
+				if (level == 0) {
+					if (i == exprStr.length() - 1) {
+						exprStr = exprStr.substring(1, i);
+						// phase again to avoid nested brace.
+						i = 0;
+					}
+					else {
+						// redundant brace already removed.
+						break;
+					}
+				}
+			}
+		}
+		return exprStr;
+	}
+
+	private Expr exprVecotr2Tree(Vector<String> exprs, Vector<String> operators)
+			throws ExprError {
+		
+		Vector<Expr> exprTrees = new Vector<Expr>();
+		for (int i = 0; i < exprs.size(); i++) {
+			exprTrees.add(i, exprStr2Tree(exprs.elementAt(i)));
+		}
+		
+	
+		while (operators.size() > 0) {
+			int opIndex;
+			Expr exprTree = null;
+			
+			opIndex = findHighestOperator(operators);
+			exprTree = new Expr(operators.elementAt(opIndex),
+					exprTrees.elementAt(opIndex),
+					exprTrees.elementAt(opIndex + 1));
+			operators.remove(opIndex);
+			exprTrees.remove(opIndex + 1);
+			exprTrees.set(opIndex, exprTree);
+		}
+		
+		if (exprTrees.size() != 1) {
+			throw new ExprError("Generation of expression tree failed by unknow reason.");
+		}
+		
+		// recursion calling this function to create an expression tree.
+		return exprTrees.firstElement();
 	}
 
 }

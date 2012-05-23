@@ -11,11 +11,26 @@ public class ExprNomalizerTest {
 
 	@Test
 	public void testExprNomalizer() {
-		String srcExpr = "-5  /(5-(4.0))";
-		String dstExpr = "((-5) / (5 - 4.0))";
-		ExprBetter cleaner = new FakeExprCleaner(srcExpr);
-		ExprNomalizer nomalizer = new ExprNomalizer(cleaner);
-		assertEquals(dstExpr, nomalizer.getResult());
+		final String srcExpr[] = {
+				"1+2",
+				"1 +4/ 2",
+				"1 +4/ (1+1)",
+				"1 +4/ 2 /1 + 3",
+				"-5  /((-5)-(4.0))--1",
+				};
+		final String dstExpr[] = {
+				"1 + 2",
+				"1 + 4 / 2",
+				"1 + 4 / (1 + 1)",
+				"1 + 4 / 2 / 1 + 3",
+				"(-5) / ((-5) - 4.0) - (-1)",
+				};
+		
+		for (int i = 0; i < srcExpr.length; i++) {
+			ExprBetter cleaner = new FakeExprCleaner(srcExpr[i]);
+			ExprNomalizer nomalizer = new ExprNomalizer(cleaner);
+			assertEquals(dstExpr[i], nomalizer.getResult());
+		}
 	}
 
 }
