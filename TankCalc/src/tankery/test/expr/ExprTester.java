@@ -2,6 +2,8 @@ package tankery.test.expr;
 
 import tankery.expr.interpret.ExprInterpreter;
 import tankery.expr.tree.Expr;
+import tankery.ui.console.ConsoleCalc;
+import tankery.ui.dialog.TankCalc;
 
 public final class ExprTester {
 
@@ -12,7 +14,18 @@ public final class ExprTester {
 		testExpr();
 		testExprInterpreter();
 		
+		// run console.
+		runExpr();
+		
+		// run GUI.
+		new TankCalc("TankCalc");
+		
 		return;
+	}
+
+	private static void runExpr() {
+		ConsoleCalc calc = new ConsoleCalc();
+		calc.run();
 	}
 
 	private static void testExprInterpreter() {
