@@ -22,6 +22,7 @@ public class TankCalc {
 		frame.getContentPane().add(new CalcPanel());
 		
 		frame.pack();
+		frame.setMinimumSize(frame.getSize());
 		frame.setVisible(true);
 	}
 

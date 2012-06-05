@@ -15,7 +15,7 @@ public final class ExprTester {
 		testExprInterpreter();
 		
 		// run console.
-		runExpr();
+		// runExpr();
 		
 		// run GUI.
 		new TankCalc("TankCalc");
