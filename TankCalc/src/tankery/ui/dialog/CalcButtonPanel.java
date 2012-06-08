@@ -5,19 +5,34 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.EventListener;
-
+import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class CalcButtonPanel extends JPanel {
+
+	public enum ButtonType {
+		NUM_BUTTON,
+		OPT_BUTTON,
+		FUN_BUTTON,
+		MEM_BUTTON,
+	}
 	
 	private static final long serialVersionUID = -2046447342746886052L;
 	
 	private String buttonValue;
 	private ActionListener eventListener;
+	
+	final static String memString[] = {
+			"MC", "MR", "MS", "M+", "M-"
+	};
+	final static String funString[] = {
+			"←", "CE", "C"
+	};
+	final static String optString[] = {
+			"±", "/", "*", "-", "+", "√", "(", ")", "="
+	};
 
 	public CalcButtonPanel(ActionListener listener) {
 		eventListener = listener;
@@ -32,17 +47,17 @@ public class CalcButtonPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		JButton button;
+		//maximum height, maximum width
 		c.fill = GridBagConstraints.BOTH;
+		// distributing buttons with space (insets).
 		c.weightx = 0.5;
 		c.weighty = 0.5;
+		c.insets = new Insets(2, 4, 2, 4);
 
-		String memString[] = {
-				"MC", "MR", "MS", "M+", "M-"
-		};
+		JButton button;
+
 		for (int x = 0; x < memString.length; x++) {
 			button = createMemButton(memString[x]);
-			c.insets = new Insets(2, 4, 2, 4);
 			c.gridx = x;
 			c.gridy = 0;
 			c.gridwidth = 1;
@@ -50,51 +65,32 @@ public class CalcButtonPanel extends JPanel {
 			c.ipadx = 5;
 			add(button, c);
 		}
-		
-		String funString[] = {
-				"←", "CE", "C"
-		};
 		for (int x = 0; x < funString.length; x++) {
 			button = createButton(funString[x]);
-			c.insets = new Insets(2, 4, 2, 4);
 			c.gridx = x;
 			c.gridy = 1;
 			c.gridwidth = 1;
 			c.gridheight = 1;
 			add(button, c);
 		}
-		
-		String opString[] = {
-				"±", "/", "*", "-", "+", "√", "(", ")"
-		};
 		for (int x = 0; x < 2; x++) {
 			for (int y = 0; y < 5; y++) {
 				int i = x*5 + y;
-				if (i == opString.length) {
-					x = 2;
-					y = 5;
-					break;
-				}
-				button = createButton(opString[i]);
-				c.insets = new Insets(2, 4, 2, 4);
+				
 				c.gridx = x + 3;
 				c.gridy = y + 1;
 				c.gridwidth = 1;
 				c.gridheight = 1;
+				
+				// if the last one.
+				if (i == (optString.length - 1)) {
+					c.gridheight = 5 - y; // span it.
+					x = 2; y = 5; // quit after this turn.
+				}
+				button = createButton(optString[i]);
 				add(button, c);
 			}
 		}
-
-		c.fill = GridBagConstraints.BOTH;
-		
-		button = createButton("=");
-		c.insets = new Insets(2, 4, 2, 4);
-		c.gridx = 4;
-		c.gridy = 4;
-		c.gridwidth = 1;
-		c.gridheight = 2;
-		add(button, c);
-		
 		
 		Component numBtns = createNumButtonPanel();
 		c.insets = new Insets(0, 0, 0, 0);
@@ -110,8 +106,9 @@ public class CalcButtonPanel extends JPanel {
 		pane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		//natural height, maximum width
+		//maximum height, maximum width
 		c.fill = GridBagConstraints.BOTH;
+		// distributing buttons.
 		c.weightx = 0.5;
 		c.weighty = 0.5;
 		
@@ -162,5 +159,20 @@ public class CalcButtonPanel extends JPanel {
 		btn.setMargin(new Insets(2, 4, 2, 4));
 		btn.addActionListener(eventListener);
 		return btn;
+	}
+	
+	public static ButtonType getButtonType(String btn) {
+		if (Arrays.asList(memString).contains(btn)) {
+			return ButtonType.MEM_BUTTON;
+		}
+		else if (Arrays.asList(funString).contains(btn)) {
+			return ButtonType.FUN_BUTTON;
+		}
+		else if (Arrays.asList(optString).contains(btn)) {
+			return ButtonType.OPT_BUTTON;
+		}
+		else {
+			return ButtonType.NUM_BUTTON;
+		}
 	}
 }
