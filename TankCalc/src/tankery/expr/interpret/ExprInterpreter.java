@@ -112,6 +112,13 @@ public class ExprInterpreter {
 			return -1;
 		}
 		
+		// if contains "√", return it.
+		for (int i = 0; i < ops.size(); i++) {
+			if (ops.elementAt(i).equals("√")) {
+				return i;
+			}
+		}
+		
 		// if contains "*" or "/", return it.
 		for (int i = 0; i < ops.size(); i++) {
 			if (ops.elementAt(i).equals("*") || ops.elementAt(i).equals("/")) {

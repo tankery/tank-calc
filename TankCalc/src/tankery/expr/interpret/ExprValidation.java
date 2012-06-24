@@ -9,7 +9,7 @@ package tankery.expr.interpret;
  */
 public final class ExprValidation {
 	final static String numbers = "\\d\\.";
-	final static String operators = "\\+\\-\\*/";
+	final static String operators = "\\+\\-\\*/√";
 	
 	public final static String validNumber() {
 		return generate(numbers);

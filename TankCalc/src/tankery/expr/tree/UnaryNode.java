@@ -23,6 +23,9 @@ public class UnaryNode implements ExprNode {
 		if (operator.equals("-")) {
 			return -opNode.evaluation();
 		}
+		else if (operator.equals("√")) {
+			return Math.sqrt(opNode.evaluation());
+		}
 		
 		throw new ExprOperatorError(operator, this.toString());
 	}
